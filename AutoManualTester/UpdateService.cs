@@ -47,6 +47,7 @@ internal sealed class UpdateService : IDisposable
         }
         catch
         {
+            _updateStarted = false;
             // Retry automatically on the next interval when network access is unavailable.
         }
         finally
@@ -85,6 +86,7 @@ internal sealed class UpdateService : IDisposable
         start.ArgumentList.Add(zipPath);
         start.ArgumentList.Add(Environment.ProcessId.ToString());
         start.ArgumentList.Add(actualHash);
+        start.ArgumentList.Add(currentExe);
         Process.Start(start);
 
         StatusChanged?.Invoke($"Update {manifest.Version} verified. Restarting...");
