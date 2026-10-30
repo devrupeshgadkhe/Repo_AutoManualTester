@@ -1,0 +1,43 @@
+name: Windows build and release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore AutoManualTester/AutoManualTester.csproj
+
+      - name: Publish Windows x64
+        run: dotnet publish AutoManualTester/AutoManualTester.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/AutoManualTester-win-x64
+
+      - name: Create ZIP
+        run: Compress-Archive -Path artifacts/AutoManualTester-win-x64/* -DestinationPath artifacts/AutoManualTester-win-x64.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AutoManualTester-win-x64
+          path: artifacts/AutoManualTester-win-x64.zip
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/AutoManualTester-win-x64.zip
