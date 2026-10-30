@@ -26,6 +26,7 @@ internal static class Program
             var zipPath = args[1];
             var parentPid = int.Parse(args[2]);
             var expectedHash = args[3];
+            var targetExePath = args[4];
 
             try { Process.GetProcessById(parentPid).WaitForExit(); }
             catch (ArgumentException) { }
@@ -39,12 +40,14 @@ internal static class Program
 
             ZipFile.ExtractToDirectory(zipPath, AppContext.BaseDirectory, overwriteFiles: true);
             File.Delete(zipPath);
-            Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(targetExePath) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
             var logPath = Path.Combine(Path.GetTempPath(), "AutoManualTester-update-error.txt");
             File.WriteAllText(logPath, ex.ToString());
+            if (args.Length > 4 && File.Exists(args[4]))
+                Process.Start(new ProcessStartInfo(args[4]) { UseShellExecute = true });
         }
     }
 }
