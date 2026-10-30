@@ -18,6 +18,7 @@ public sealed class MainForm : Form
     private Process? _targetProcess;
     private FlaUI.Core.Application? _automationApp;
     private UIA3Automation? _automation;
+    private readonly UpdateService _updateService = new();
 
     public MainForm()
     {
@@ -57,7 +58,16 @@ public sealed class MainForm : Form
         _launch.Click += (_, _) => LaunchTarget();
         _inspect.Click += (_, _) => InspectControls();
         _stop.Click += (_, _) => StopTarget();
-        FormClosing += (_, _) => DisposeAutomation();
+        _updateService.StatusChanged += message =>
+        {
+            if (!IsDisposed && IsHandleCreated)
+                BeginInvoke(() => Log(message));
+        };
+        FormClosing += (_, _) =>
+        {
+            _updateService.Dispose();
+            DisposeAutomation();
+        };
     }
 
     private void Browse()
