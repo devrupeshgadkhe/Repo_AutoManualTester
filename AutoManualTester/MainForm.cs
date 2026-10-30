@@ -18,7 +18,7 @@ public sealed class MainForm : Form
     private readonly Label _status = new() { Text = "Select a Windows application to begin.", AutoSize = true };
     private string? _selectedPath;
     private Process? _targetProcess;
-    private Application? _automationApp;
+    private FlaUI.Core.Application? _automationApp;
     private UIA3Automation? _automation;
 
     public MainForm()
