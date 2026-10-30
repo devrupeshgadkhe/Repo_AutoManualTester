@@ -1,3 +1,5 @@
+using AutoManualTester.Core.Models;
+
 namespace AutoManualTester.Core.Safety;
 
 public sealed record ExecutionPolicy
@@ -18,7 +20,7 @@ public sealed record ExecutionPolicy
             throw new ArgumentOutOfRangeException(nameof(MinimumActionInterval));
     }
 
-    public bool RequiresApproval(Core.Models.TestAction action) =>
+    public bool RequiresApproval(TestAction action) =>
         (action.IsDestructive && !AllowDestructiveActions) ||
         (action.HasExternalSideEffect && !AllowExternalSideEffects);
 }
@@ -26,6 +28,6 @@ public sealed record ExecutionPolicy
 public interface IActionApproval
 {
     ValueTask<bool> RequestApprovalAsync(
-        Core.Models.TestAction action,
+        TestAction action,
         CancellationToken cancellationToken);
 }
